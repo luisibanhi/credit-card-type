@@ -9,6 +9,7 @@ var DISCOVER = 'discover';
 var JCB = 'jcb';
 var UNIONPAY = 'unionpay';
 var MAESTRO = 'maestro';
+var ELO = 'elo';
 var CVV = 'CVV';
 var CID = 'CID';
 var CVC = 'CVC';
@@ -21,7 +22,8 @@ var testOrder = [
   DISCOVER,
   JCB,
   UNIONPAY,
-  MAESTRO
+  MAESTRO,
+  ELO
 ];
 
 function clone(originalObject) {
@@ -39,8 +41,8 @@ function clone(originalObject) {
 types[VISA] = {
   niceType: 'Visa',
   type: VISA,
-  prefixPattern: /^4$/,
-  exactPattern: /^4\d*$/,
+  prefixPattern: /^4(?!38935|011|51416|576)?$/,
+  exactPattern: /^4(?!38935|011|51416|576)\d{12}(?:\d{3})*$/,
   gaps: [4, 8, 12],
   lengths: [16, 18, 19],
   code: {
@@ -52,7 +54,7 @@ types[VISA] = {
 types[MASTERCARD] = {
   niceType: 'Mastercard',
   type: MASTERCARD,
-  prefixPattern: /^(5|5[1-5]|2|22|222|222[1-9]|2[3-6]|27|27[0-2]|2720)$/,
+  prefixPattern: /^(5|5[1-5]|2|22|222|222[1-9]|2[3-6]|27|27[0-2]|2720)(?!04175|067|06699)$/,
   exactPattern: /^(5[1-5]|222[1-9]|22[3-9]|2[3-6]|27[0-1]|2720)\d*$/,
   gaps: [4, 8, 12],
   lengths: [16],
@@ -141,6 +143,19 @@ types[MAESTRO] = {
   }
 };
 
+types[ELO] = {
+  niceType: 'Elo',
+  type: ELO,
+  prefixPattern: /^(4011(78|79)|43(1274|8935)|45(1416|7393|763(1|2))|50(4175|6699|67[0-7][0-9]|9000)|627780|63(6297|6368)|650(03([^4])|04([0-9])|05(0|1)|4(0[5-9]|3[0-9]|8[5-9]|9[0-9])|5([0-2][0-9]|3[0-8])|9([2-6][0-9]|7[0-8])|541|700|720|901)|651652|655000|655021)/,
+  exactPattern: /^(4011(78|79)|43(1274|8935)|45(1416|7393|763(1|2))|50(4175|6699|67[0-7][0-9]|9000)|627780|63(6297|6368)|650(03([^4])|04([0-9])|05(0|1)|4(0[5-9]|3[0-9]|8[5-9]|9[0-9])|5([0-2][0-9]|3[0-8])|9([2-6][0-9]|7[0-8])|541|700|720|901)|651652|655000|655021)/,
+  gaps: [4, 8, 12],
+  lengths: [16],
+  code: {
+    name: CVV,
+    size: 3
+  }
+};
+
 function creditCardType(cardNumber) {
   var type, value, i;
   var prefixResults = [];
@@ -181,7 +196,8 @@ creditCardType.types = {
   DISCOVER: DISCOVER,
   JCB: JCB,
   UNIONPAY: UNIONPAY,
-  MAESTRO: MAESTRO
+  MAESTRO: MAESTRO,
+  ELO: ELO
 };
 
 module.exports = creditCardType;
